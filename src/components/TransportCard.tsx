@@ -17,8 +17,20 @@ interface BusDeparture {
   departureTime: string;
   realTime: string;
   delay: number;
-  status: string;
+  status: "onTime" | "delayed" | "cancelled" | "early";
   minutesUntil: number;
+  type: string;
+}
+
+interface RawDeparture {
+  id: string;
+  tripId: string;
+  line: string;
+  destination?: string;
+  departureTime: string;
+  realTime: string;
+  delay: number;
+  status: "onTime" | "delayed" | "cancelled" | "early";
   type: string;
 }
 
@@ -285,7 +297,7 @@ export default function TransportCard() {
 
       // Filtrera för relevanta busslinjerna och säkerställ 2 avgångar från Klinga
       const filteredKlinga = klingaData.filter(
-        (dep: any) =>
+        (dep: RawDeparture) =>
           ["480", "482", "486"].includes(dep.line) &&
           (dep.destination?.toLowerCase().includes("norrköping") ||
             dep.destination?.toLowerCase().includes("östra station") ||
@@ -293,7 +305,7 @@ export default function TransportCard() {
       );
 
       const processedKlinga = filteredKlinga
-        .map((dep: any) => ({
+        .map((dep: RawDeparture) => ({
           ...dep,
           minutesUntil: calculateMinutesUntil(dep.realTime, false),
         }))
@@ -316,7 +328,7 @@ export default function TransportCard() {
 
       // Filtrera för relevanta busslinjerna och säkerställ 2 avgångar från Söder Tull
       const filteredSoderTull = soderTullData.filter(
-        (dep: any) =>
+        (dep: RawDeparture) =>
           ["480", "482", "486"].includes(dep.line) &&
           (dep.destination?.toLowerCase().includes("klinga") ||
             dep.destination?.toLowerCase().includes("skärblacka") ||
@@ -325,7 +337,7 @@ export default function TransportCard() {
       );
 
       const processedSoderTull = filteredSoderTull
-        .map((dep: any) => ({
+        .map((dep: RawDeparture) => ({
           ...dep,
           minutesUntil: calculateMinutesUntil(dep.realTime, false),
         }))
@@ -379,6 +391,7 @@ export default function TransportCard() {
   useEffect(() => {
     console.log("🚀 Initial fetch vid sidladdning");
     loadTransportData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Kör bara en gång vid mount
 
   // Uppdatera klienttid varje minut för att hålla "X min" aktuellt
@@ -399,6 +412,7 @@ export default function TransportCard() {
     }, 5 * 60 * 1000);
 
     return () => clearInterval(mainInterval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Smart refresh när bussar går + hantera realtime-ändringar
@@ -423,6 +437,7 @@ export default function TransportCard() {
     }, timeUntilRefresh);
 
     return () => clearTimeout(timeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nextRefreshTime]);
 
   // Extra kontroll för realtime-ändringar var 2:a minut
@@ -444,6 +459,7 @@ export default function TransportCard() {
     }, 2 * 60 * 1000); // Var 2:a minut
 
     return () => clearInterval(realtimeCheck);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [klingaDepartures, soderTullDepartures]);
 
   if (loading) {
@@ -456,6 +472,7 @@ export default function TransportCard() {
         <div className="flex items-center space-x-2 md:space-x-3">
           {/* Östgötatrafiken logga - mindre på mobil */}
           <div className="w-6 h-6 md:w-8 md:h-8 bg-white rounded-lg flex items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="https://www.ostgotatrafiken.se/favicon.ico"
               alt="Östgötatrafiken"
@@ -507,7 +524,7 @@ export default function TransportCard() {
           </h3>
           {klingaDepartures.length === 0 ? (
             <p className="text-white/60 text-sm">
-              Klicka "Uppdatera" för att hämta avgångar
+              Klicka &quot;Uppdatera&quot; för att hämta avgångar
             </p>
           ) : (
             <div className="space-y-2">
@@ -602,7 +619,7 @@ export default function TransportCard() {
           </h3>
           {soderTullDepartures.length === 0 ? (
             <p className="text-white/60 text-sm">
-              Klicka "Uppdatera" för att hämta avgångar
+              Klicka &quot;Uppdatera&quot; för att hämta avgångar
             </p>
           ) : (
             <div className="space-y-2">

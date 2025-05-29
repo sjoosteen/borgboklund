@@ -1,9 +1,10 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
 export default function TestStationsPage() {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [response, setResponse] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -16,38 +17,42 @@ export default function TestStationsPage() {
     setResponse(null);
 
     try {
-      const res = await fetch(`/api/stop-lookup?q=${encodeURIComponent(query)}`);
+      const res = await fetch(
+        `/api/stop-lookup?q=${encodeURIComponent(query)}`
+      );
       const data = await res.json();
-      
+
       if (!res.ok) {
-        setError(`API Error: ${res.status} - ${data.error || 'Unknown error'}`);
+        setError(`API Error: ${res.status} - ${data.error || "Unknown error"}`);
       } else {
         setResponse(data);
       }
     } catch (err) {
-      setError(`Network Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setError(
+        `Network Error: ${err instanceof Error ? err.message : "Unknown error"}`
+      );
     } finally {
       setLoading(false);
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       searchStations();
     }
   };
 
   const quickSearches = [
-    'Klinga',
-    'Norrköping',
-    'Östra station',
-    'Strömporten',
-    'Söder Tull',
-    '740055002',
-    '17317',
-    '856',
-    '480',
-    'Centralstation'
+    "Klinga",
+    "Norrköping",
+    "Östra station",
+    "Strömporten",
+    "Söder Tull",
+    "740055002",
+    "17317",
+    "856",
+    "480",
+    "Centralstation",
   ];
 
   return (
@@ -73,7 +78,7 @@ export default function TestStationsPage() {
               disabled={loading || !query.trim()}
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              {loading ? 'Söker...' : 'Sök'}
+              {loading ? "Söker..." : "Sök"}
             </button>
           </div>
 
@@ -104,21 +109,26 @@ export default function TestStationsPage() {
         {response && (
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              📡 API Response för "{query}"
+              📡 API Response för &quot;{query}&quot;
             </h2>
-            
+
             {/* Summary */}
             {response.stopGroups && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                <h3 className="text-blue-800 font-semibold mb-2">📊 Sammanfattning</h3>
+                <h3 className="text-blue-800 font-semibold mb-2">
+                  📊 Sammanfattning
+                </h3>
                 <p className="text-blue-700">
-                  Hittade <strong>{response.stopGroups.length}</strong> stationsgrupper
+                  Hittade <strong>{response.stopGroups.length}</strong>{" "}
+                  stationsgrupper
                 </p>
                 {response.stopGroups.length > 0 && (
                   <div className="mt-2">
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                     {response.stopGroups.map((group: any, index: number) => (
                       <div key={index} className="text-sm text-blue-600 mb-1">
-                        <strong>{group.name}</strong> (ID: {group.id}) - {group.stops?.length || 0} hållplatser
+                        <strong>{group.name}</strong> (ID: {group.id}) -{" "}
+                        {group.stops?.length || 0} hållplatser
                       </div>
                     ))}
                   </div>
@@ -128,7 +138,9 @@ export default function TestStationsPage() {
 
             {/* Raw JSON Response */}
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <h3 className="text-gray-800 font-semibold mb-2">🔍 Fullständig JSON Response</h3>
+              <h3 className="text-gray-800 font-semibold mb-2">
+                🔍 Fullständig JSON Response
+              </h3>
               <pre className="text-xs text-gray-700 overflow-auto max-h-96 whitespace-pre-wrap">
                 {JSON.stringify(response, null, 2)}
               </pre>
@@ -140,10 +152,19 @@ export default function TestStationsPage() {
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-6">
           <h3 className="text-yellow-800 font-semibold mb-2">💡 Tips</h3>
           <ul className="text-yellow-700 text-sm space-y-1">
-            <li>• Testa att söka på stationsnamn som "Klinga", "Norrköping", "Östra station"</li>
-            <li>• Testa att söka på station-ID:n som "740055002", "17317", "856"</li>
-            <li>• Testa att söka på linjenummer som "480"</li>
-            <li>• API:et söker först i ResRobot, sedan i Trafiklab om ResRobot misslyckas</li>
+            <li>
+              • Testa att söka på stationsnamn som &quot;Klinga&quot;,
+              &quot;Norrköping&quot;, &quot;Östra station&quot;
+            </li>
+            <li>
+              • Testa att söka på station-ID:n som &quot;740055002&quot;,
+              &quot;17317&quot;, &quot;856&quot;
+            </li>
+            <li>• Testa att söka på linjenummer som &quot;480&quot;</li>
+            <li>
+              • API:et söker först i ResRobot, sedan i Trafiklab om ResRobot
+              misslyckas
+            </li>
           </ul>
         </div>
       </div>

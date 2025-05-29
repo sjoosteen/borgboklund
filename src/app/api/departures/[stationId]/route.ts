@@ -48,6 +48,7 @@ interface TrafiklabDeparture {
     id: string;
     designation: string;
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   alerts: any[];
   is_realtime: boolean;
 }
@@ -70,7 +71,7 @@ export interface Departure {
   departureTime: string;
   realTime: string;
   delay: number;
-  status: "onTime" | "delayed" | "cancelled";
+  status: "onTime" | "delayed" | "cancelled" | "early";
   platform?: string;
   type: "bus" | "train" | "tram";
 }
@@ -95,7 +96,9 @@ function getTransportType(
   }
 }
 
-function getStatus(delaySeconds: number): "onTime" | "delayed" | "cancelled" {
+function getStatus(
+  delaySeconds: number
+): "onTime" | "delayed" | "cancelled" | "early" {
   if (delaySeconds === 0) return "onTime";
   if (delaySeconds > 0) return "delayed";
   return "early";
@@ -171,7 +174,7 @@ export async function GET(
 
     const todayData =
       (await todayResponse.json()) as TrafiklabDeparturesResponse;
-    let allDepartures = todayData.departures || [];
+    const allDepartures = todayData.departures || [];
 
     console.log(`✅ Found ${allDepartures.length} departures for today`);
 

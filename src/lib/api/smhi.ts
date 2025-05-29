@@ -52,7 +52,6 @@ function getWeatherDescription(symbol: number): string {
 }
 
 function parseWeatherData(data: SMHIResponse): WeatherData {
-  const now = new Date();
   const currentData = data.timeSeries[0];
 
   // Extrahera aktuell väderdata
@@ -73,6 +72,7 @@ function parseWeatherData(data: SMHIResponse): WeatherData {
 
   // Skapa 7-dagars prognos
   const forecast: WeatherForecast[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const dailyData = new Map<string, any>();
 
   // Gruppera data per dag
@@ -152,6 +152,7 @@ async function fetchWeatherWarnings(): Promise<WeatherWarning[]> {
           id: alert.identifier,
           title: info.headline,
           description: info.description,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           severity: info.severity.toLowerCase() as any,
           validFrom: info.effective,
           validTo: info.expires,

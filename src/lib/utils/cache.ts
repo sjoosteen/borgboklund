@@ -78,11 +78,12 @@ class LocalStorageCache {
       const stored = localStorage.getItem(this.prefix + key);
       if (!stored) return true;
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const item: CacheItem<any> = JSON.parse(stored);
       const now = Date.now();
 
       return now - item.timestamp > item.expiresIn;
-    } catch (error) {
+    } catch {
       return true;
     }
   }

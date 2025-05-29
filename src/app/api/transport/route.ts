@@ -79,6 +79,7 @@ interface TrafiklabDeparture {
     id: string;
     designation: string;
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   alerts: any[];
   is_realtime: boolean;
 }
@@ -127,6 +128,7 @@ interface TrafiklabArrival {
     id: string;
     designation: string;
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   alerts: any[];
   is_realtime: boolean;
 }
@@ -137,6 +139,7 @@ interface TrafiklabDeparturesResponse {
     queryTime: string;
     query: string;
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   stops: any[];
   departures: TrafiklabDeparture[];
 }
@@ -147,6 +150,7 @@ interface TrafiklabArrivalsResponse {
     queryTime: string;
     query: string;
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   stops: any[];
   arrivals: TrafiklabArrival[];
 }
@@ -514,18 +518,23 @@ export async function GET(request: NextRequest) {
 
     const data = await response.json();
     console.log(`✅ === TIMETABLES API SUCCESS ===`);
-    console.log(`✅ Response Data Structure:`, {
-      hasDepartures: !!(
-        data as TrafiklabDeparturesResponse | TrafiklabArrivalsResponse
-      ).departures,
-      hasArrivals: !!(
-        data as TrafiklabDeparturesResponse | TrafiklabArrivalsResponse
-      ).arrivals,
-      departuresCount:
-        (data as TrafiklabDeparturesResponse).departures?.length || 0,
-      arrivalsCount: (data as TrafiklabArrivalsResponse).arrivals?.length || 0,
-      dataKeys: Object.keys(data),
-    });
+
+    // Type-safe checking based on direction
+    if (direction === "departures") {
+      const departuresData = data as TrafiklabDeparturesResponse;
+      console.log(`✅ Response Data Structure:`, {
+        hasDepartures: !!departuresData.departures,
+        departuresCount: departuresData.departures?.length || 0,
+        dataKeys: Object.keys(data),
+      });
+    } else {
+      const arrivalsData = data as TrafiklabArrivalsResponse;
+      console.log(`✅ Response Data Structure:`, {
+        hasArrivals: !!arrivalsData.arrivals,
+        arrivalsCount: arrivalsData.arrivals?.length || 0,
+        dataKeys: Object.keys(data),
+      });
+    }
     console.log(`✅ Full Response:`, JSON.stringify(data, null, 2));
 
     // Konvertera och filtrera data
